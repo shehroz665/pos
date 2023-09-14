@@ -27,7 +27,7 @@ class AuthController extends Controller
             //     return ApiResponse::error(false,'Invalid credentials',[],500);
             // }
             if (!Auth::attempt($request->only('email', 'password'))) {
-                return ApiResponse::error(false, 'Invalid credentials', [], 500);
+                return ApiResponse::error(false, 'Invalid credentials', [], 401);
             }
             $user = Auth::user();
             $token = $request->boolean('remember_me') ?
@@ -39,7 +39,7 @@ class AuthController extends Controller
             ];
             return ApiResponse::success(true,'User Logged In Successfully',$data,200);      
         } catch (\Throwable $e) {
-            return  ApiResponse::error(false, $e->getMessage(),[],500);
+            return  ApiResponse::error(false, $e->getMessage(),[],401);
         }
     }
     
