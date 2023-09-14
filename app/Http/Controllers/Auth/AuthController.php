@@ -37,6 +37,7 @@ class AuthController extends Controller
             $data = [
                 'token' => $token,
             ];
+            session(['api_token' => $token]);
             return ApiResponse::success(true,'User Logged In Successfully',$data,200);      
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],401);
