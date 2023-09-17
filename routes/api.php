@@ -15,14 +15,15 @@ use App\Http\Controllers\Category\ProductCategoryController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/productcategory',[ProductCategoryController::class,'index']);
-    Route::post('/productcategory/add',[ProductCategoryController::class,'store']);
+    Route::prefix('productcategory')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [ProductCategoryController::class, 'index']);
+        Route::post('/add', [ProductCategoryController::class, 'store']);
+        Route::post('/update/{id}', [ProductCategoryController::class, 'update']);
+        Route::delete('/destory/{id}', [ProductCategoryController::class, 'destory']);
+        Route::get('/{id}', [ProductCategoryController::class, 'edit']);
+    });
 });

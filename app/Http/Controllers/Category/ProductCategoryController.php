@@ -21,7 +21,8 @@ class ProductCategoryController extends Controller
                     'cat_name' => $request->cat_name,
                     'user_id' => $userId,
                     'added_by' => $userId,
-                    'modified_by'=>$userId
+                    'modified_by'=>$userId,
+                    'status'=>1,
             ];
             $category = ProductCategory::create($data);
             DB::commit();
@@ -39,10 +40,56 @@ class ProductCategoryController extends Controller
                 $per_page=$request->per_page; 
             }
             $userId= auth()->user()->id;
-            $category = ProductCategory::where('user_id',$userId)->paginate($per_page);
+            $category = ProductCategory::where('user_id',$userId)->where('status',1)->paginate($per_page);
             return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
     }
+    public function destory($id){
+        try {
+            $category = ProductCategory::find($id);
+            $category->status=2;
+            $category->save();
+            return ApiResponse::success(true,'Product Category deleted successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function restoreOrDelete(Request $request,$id){
+        //status=1 means restore,status=2 means delete
+        try {
+            $userId= auth()->user()->id;
+            if($request->status===1){
+                
+            }
+            else{
+            
+            }
+
+            $category = ProductCategory::where('user_id',$userId)->where('status',1)->paginate($per_page);
+            return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function edit($id){
+        try {
+            $category = ProductCategory::find($id);
+            return ApiResponse::success(true,'Product Category fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function update(Request $request,$id){
+        try {
+            $category = ProductCategory::find($id);
+            $category->cat_name=$request->cat_name;
+            $category->save();
+            return ApiResponse::success(true,'Product Category updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+
 }
