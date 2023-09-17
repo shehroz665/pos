@@ -40,7 +40,7 @@ class ProductCategoryController extends Controller
                 $per_page=$request->per_page; 
             }
             $userId= auth()->user()->id;
-            $category = ProductCategory::where('user_id',$userId)->where('status',1)->paginate($per_page);
+            $category = ProductCategory::where('user_id',$userId)->whereIn('status',[0,1])->paginate($per_page);
             return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
@@ -52,23 +52,6 @@ class ProductCategoryController extends Controller
             $category->status=2;
             $category->save();
             return ApiResponse::success(true,'Product Category deleted successfully',$category,200);
-        } catch (\Throwable $e) {
-            return  ApiResponse::error(false, $e->getMessage(),[],500);
-        } 
-    }
-    public function restoreOrDelete(Request $request,$id){
-        //status=1 means restore,status=2 means delete
-        try {
-            $userId= auth()->user()->id;
-            if($request->status===1){
-                
-            }
-            else{
-            
-            }
-
-            $category = ProductCategory::where('user_id',$userId)->where('status',1)->paginate($per_page);
-            return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
@@ -91,5 +74,50 @@ class ProductCategoryController extends Controller
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
     }
+    public function changeStatus($id){
+        try {
+            $category = ProductCategory::find($id);
+            $status = $category->status;
+            if($status===1){
+                $category->status=0;
+            }
+            else{
+                $category->status=1;
+            }
+            $category->save();
+            return ApiResponse::success(true,'Product Category status updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function archive(Request $request){
+        try {
+            $per_page=10;
+            if($request->per_page){
+                $per_page=$request->per_page; 
+            }
+            $userId= auth()->user()->id;
+            $category = ProductCategory::where('user_id',$userId)->where('status',2)->paginate($per_page);
+            return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function restoreOrDelete(Request $request,$id){
+        try {
+            $category = ProductCategory::find($id);
+            if($request->status===1){
+                $category->status=1;
+            }
+            else{
+                $category->status=3;
+            }
+            $category->save();
+            return ApiResponse::success(true,'Product Category status updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+   
 
 }
