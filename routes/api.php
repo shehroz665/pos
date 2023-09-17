@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Category\ProductCategoryController;
+use App\Http\Controllers\Supplier\SupplierController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,5 +29,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/restoreOrDelete/{id}', [ProductCategoryController::class, 'restoreOrDelete']);
         Route::delete('/destory/{id}', [ProductCategoryController::class, 'destory']);
         Route::get('/{id}', [ProductCategoryController::class, 'edit']);
+    });
+    Route::prefix('supplier')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [SupplierController::class, 'index']);
+        Route::get('/archive', [SupplierController::class, 'archive']);
+        Route::post('/add', [SupplierController::class, 'store']);
+        Route::post('/update/{id}', [SupplierController::class, 'update']);
+        Route::post('/changeStatus/{id}', [SupplierController::class, 'changeStatus']);
+        Route::post('/restoreOrDelete/{id}', [SupplierController::class, 'restoreOrDelete']);
+        Route::delete('/destory/{id}', [SupplierController::class, 'destory']);
+        Route::get('/{id}', [SupplierController::class, 'edit']);
     });
 });
