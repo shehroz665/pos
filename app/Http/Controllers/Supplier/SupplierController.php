@@ -16,7 +16,6 @@ class SupplierController extends Controller
             $request->validate([
                 'sup_name' => 'required|string',
                 'sup_contact'=> 'required|string',
-                'sup_description'=>'string'
             ]);
             $userId= auth()->user()->id;
             DB::beginTransaction();
@@ -24,7 +23,6 @@ class SupplierController extends Controller
                     'sup_name' => $request->sup_name,
                     'sup_contact'=>$request->sup_contact,
                     'sup_description'=>$request->sup_description,
-                    'user_id' => $userId,
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,
@@ -44,8 +42,7 @@ class SupplierController extends Controller
             if($request->per_page){
                 $per_page=$request->per_page; 
             }
-            $userId= auth()->user()->id;
-            $category = Supplier::where('user_id',$userId)->whereIn('status',[0,1])->paginate($per_page);
+            $category = Supplier::whereIn('status',[0,1])->paginate($per_page);
             return ApiResponse::success(true,'Supplier list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
@@ -72,7 +69,9 @@ class SupplierController extends Controller
     public function update(Request $request,$id){
         try {
             $category = Supplier::find($id);
-            $category->cat_name=$request->cat_name;
+            $category->sup_name=$request->sup_name;
+            $category->sup_contact=$request->sup_contact;
+            $category->sup_description=$request->sup_description;
             $category->save();
             return ApiResponse::success(true,'Supplier updated successfully',$category,200);
         } catch (\Throwable $e) {
@@ -102,7 +101,7 @@ class SupplierController extends Controller
                 $per_page=$request->per_page; 
             }
             $userId= auth()->user()->id;
-            $category = Supplier::where('user_id',$userId)->where('status',2)->paginate($per_page);
+            $category = Supplier::where('status',2)->paginate($per_page);
             return ApiResponse::success(true,'Supplier list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
