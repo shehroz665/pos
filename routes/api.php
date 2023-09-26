@@ -32,5 +32,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/dropdown', [ProductController::class, 'dropdown']);
+        Route::post('/add', [ProductController::class, 'store']);
     });
 });
