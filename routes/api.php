@@ -5,17 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Category\ProductCategoryController;
 use App\Http\Controllers\Supplier\SupplierController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
+use App\Http\Controllers\Product\ProductController;
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -39,5 +29,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/restoreOrDelete/{id}', [SupplierController::class, 'restoreOrDelete']);
         Route::delete('/destory/{id}', [SupplierController::class, 'destory']);
         Route::get('/{id}', [SupplierController::class, 'edit']);
+    });
+    Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/dropdown', [ProductController::class, 'dropdown']);
     });
 });
