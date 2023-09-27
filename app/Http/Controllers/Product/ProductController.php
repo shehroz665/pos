@@ -11,47 +11,133 @@ use App\Models\Supplier;
 use App\Models\Product;
 class ProductController extends Controller
 {
-  public function dropdown(Request $request){
-    try {
-        $suppliers = Supplier::select('sup_id','sup_name')->where('status',1)->get();
-        $category = ProductCategory::select('cat_id','cat_name')->where('status',1)->get();
-        $data = [
-            'suppliers'=> $suppliers,
-            'category' => $category
-        ];
-        return ApiResponse::success(true,'product dropdown list fetch successfully',$data,200);
-    } catch (\Throwable $e) {
-        return  ApiResponse::error(false, $e->getMessage(),[],500);
+    public function dropdown(Request $request){
+        try {
+            $suppliers = Supplier::select('sup_id','sup_name')->where('status',1)->orderBy('sup_name', 'asc')->get();
+            $category = ProductCategory::select('cat_id','cat_name')->where('status',1)->orderBy('cat_name', 'asc')->get();
+            $data = [
+                'suppliers'=> $suppliers,
+                'category' => $category
+            ];
+            return ApiResponse::success(true,'product dropdown list fetch successfully',$data,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'prod_name' => 'required',
+                'prod_sup_id'=> 'required',
+                'prod_cat_id'=>'required',
+                'prod_cost'=> 'required',
+                'prod_selling_price'=>'required'
+            ]);
+            $userId= auth()->user()->id;
+            DB::beginTransaction();
+            $data =[
+                    'prod_name' => $request->prod_name,
+                    'prod_sup_id'=>$request->prod_sup_id,
+                    'prod_cat_id'=>$request->prod_cat_id,
+                    'prod_cost'=>$request->prod_cost,
+                    'prod_selling_price'=> $request->prod_selling_price,
+                    'added_by' => $userId,
+                    'modified_by'=>$userId,
+                    'status'=>1,
+            ];
+            $product = Product::create($data);
+            DB::commit();
+            return ApiResponse::success(true,'Product added successfully',$product,200);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        }
     } 
-  }
-  public function store(Request $request)
-  {
-      try {
-          $request->validate([
-              'prod_name' => 'required',
-              'prod_sup_id'=> 'required',
-              'prod_cat_id'=>'required',
-              'prod_cost'=> 'required',
-              'prod_selling_price'=>'required'
-          ]);
-          $userId= auth()->user()->id;
-          DB::beginTransaction();
-          $data =[
-                  'prod_name' => $request->prod_name,
-                  'prod_sup_id'=>$request->prod_sup_id,
-                  'prod_cat_id'=>$request->prod_cat_id,
-                  'prod_cost'=>$request->prod_cost,
-                  'prod_selling_price'=> $request->prod_selling_price,
-                  'added_by' => $userId,
-                  'modified_by'=>$userId,
-                  'status'=>1,
-          ];
-         $product = Product::create($data);
-          DB::commit();
-          return ApiResponse::success(true,'Product added successfully',$product,200);
-      } catch (\Throwable $e) {
-          DB::rollBack();
-          return  ApiResponse::error(false, $e->getMessage(),[],500);
-      }
-  } 
+    public function index(Request $request){
+        try {
+            $per_page=10;
+            if($request->per_page){
+                $per_page=$request->per_page; 
+            }
+            $category = Product::whereIn('status',[0,1])->paginate($per_page);
+            return ApiResponse::success(true,'Product list fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function destory($id){
+        try {
+            $category = Product::find($id);
+            $category->status=2;
+            $category->save();
+            return ApiResponse::success(true,'Product deleted successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function edit($id){
+        try {
+            $category = Product::find($id);
+            return ApiResponse::success(true,'Product fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function update(Request $request,$id){
+        try {
+            $category = Supplier::find($id);
+            $category->sup_name=$request->sup_name;
+            $category->sup_contact=$request->sup_contact;
+            $category->sup_description=$request->sup_description;
+            $category->save();
+            return ApiResponse::success(true,'Supplier updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function changeStatus($id){
+        try {
+            $category = Product::find($id);
+            $status = $category->status;
+            if($status===1){
+                $category->status=0;
+            }
+            else{
+                $category->status=1;
+            }
+            $category->save();
+            return ApiResponse::success(true,'Product status updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function archive(Request $request){
+        try {
+            $per_page=10;
+            if($request->per_page){
+                $per_page=$request->per_page; 
+            }
+            $userId= auth()->user()->id;
+            $category = Product::where('status',2)->paginate($per_page);
+            return ApiResponse::success(true,'Product archive list fetch successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
+    public function restoreOrDelete(Request $request,$id){
+        try {
+            $category = Product::find($id);
+            if($request->status===1){
+                $category->status=1;
+            }
+            else{
+                $category->status=3;
+            }
+            $category->save();
+            return ApiResponse::success(true,'Product status updated successfully',$category,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
 }

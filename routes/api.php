@@ -31,7 +31,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', [SupplierController::class, 'edit']);
     });
     Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [SupplierController::class, 'index']);
+        Route::get('/archive', [SupplierController::class, 'archive']);
         Route::get('/dropdown', [ProductController::class, 'dropdown']);
         Route::post('/add', [ProductController::class, 'store']);
+        Route::post('/update/{id}', [ProductController::class, 'update']);
+        Route::post('/changeStatus/{id}', [ProductController::class, 'changeStatus']);
+        Route::post('/restoreOrDelete/{id}', [ProductController::class, 'restoreOrDelete']);
+        Route::delete('/destory/{id}', [ProductController::class, 'destory']);
+        Route::get('/{id}', [ProductController::class, 'edit']);
     });
 });
