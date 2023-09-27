@@ -31,8 +31,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', [SupplierController::class, 'edit']);
     });
     Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
-        Route::get('/', [SupplierController::class, 'index']);
-        Route::get('/archive', [SupplierController::class, 'archive']);
+        Route::get('/', [ProductController::class, 'index']);
+        Route::get('/archive', [ProductController::class, 'archive']);
         Route::get('/dropdown', [ProductController::class, 'dropdown']);
         Route::post('/add', [ProductController::class, 'store']);
         Route::post('/update/{id}', [ProductController::class, 'update']);
