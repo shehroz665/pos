@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Category\ProductCategoryController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Size\SizeController;
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -40,5 +41,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/restoreOrDelete/{id}', [ProductController::class, 'restoreOrDelete']);
         Route::delete('/destory/{id}', [ProductController::class, 'destory']);
         Route::get('/{id}', [ProductController::class, 'edit']);
+    });
+    Route::prefix('size')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [SizeController::class, 'index']);
     });
 });
