@@ -32,7 +32,8 @@ class ProductController extends Controller
                 'prod_sup_id'=> 'required',
                 'prod_cat_id'=>'required',
                 'prod_cost'=> 'required',
-                'prod_selling_price'=>'required'
+                'prod_selling_price'=>'required',
+                'prod_quantity'=> 'required',
             ]);
             $userId= auth()->user()->id;
             DB::beginTransaction();
@@ -42,6 +43,7 @@ class ProductController extends Controller
                     'prod_cat_id'=>$request->prod_cat_id,
                     'prod_cost'=>$request->prod_cost,
                     'prod_selling_price'=> $request->prod_selling_price,
+                    'prod_quantity'=> $request->prod_quantity,
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,

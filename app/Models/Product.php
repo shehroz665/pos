@@ -22,5 +22,6 @@ class Product extends Model
         'prod_cost',
         'prod_selling_price',
         'image',
+        'prod_quantity'
     ];
 }
