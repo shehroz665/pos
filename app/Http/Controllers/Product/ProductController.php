@@ -62,7 +62,6 @@ class ProductController extends Controller
             if($request->per_page){
                 $per_page=$request->per_page; 
             }
-            // $category = Product::whereIn('status',[0,1])->paginate($per_page);
             $products = Product::whereIn('products.status', [0, 1])
             ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
             ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
@@ -125,9 +124,12 @@ class ProductController extends Controller
             if($request->per_page){
                 $per_page=$request->per_page; 
             }
-            $userId= auth()->user()->id;
-            $category = Product::where('status',2)->paginate($per_page);
-            return ApiResponse::success(true,'Product archive list fetch successfully',$category,200);
+            $products = Product::where('products.status', 2)
+            ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
+            ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
+            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name')
+            ->paginate($per_page);
+            return ApiResponse::success(true,'Product archive list fetch successfully',$products,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
