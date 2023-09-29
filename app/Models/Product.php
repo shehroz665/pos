@@ -22,6 +22,7 @@ class Product extends Model
         'prod_cost',
         'prod_selling_price',
         'image',
-        'prod_quantity'
+        'prod_quantity',
+        'prod_size_id'
     ];
 }

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('prod_selling_price', 10, 2);
             $table->string('image')->nullable();
             $table->decimal('prod_quantity', 10, 1);
+            $table->unsignedBigInteger('prod_size_id');
             $table->timestamps();
         });
     }

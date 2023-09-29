@@ -8,6 +8,7 @@ use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
+use App\Models\Size;
 use App\Models\Product;
 class ProductController extends Controller
 {
@@ -15,9 +16,11 @@ class ProductController extends Controller
         try {
             $suppliers = Supplier::select('sup_id','sup_name')->where('status',1)->orderBy('sup_name', 'asc')->get();
             $category = ProductCategory::select('cat_id','cat_name')->where('status',1)->orderBy('cat_name', 'asc')->get();
+            $sizes = Size::all();
             $data = [
                 'suppliers'=> $suppliers,
-                'category' => $category
+                'category' => $category,
+                'sizes' => $sizes
             ];
             return ApiResponse::success(true,'product dropdown list fetch successfully',$data,200);
         } catch (\Throwable $e) {
@@ -34,6 +37,7 @@ class ProductController extends Controller
                 'prod_cost'=> 'required',
                 'prod_selling_price'=>'required',
                 'prod_quantity'=> 'required',
+                'prod_size_id'=> 'required'
             ]);
             $userId= auth()->user()->id;
             DB::beginTransaction();
@@ -44,6 +48,7 @@ class ProductController extends Controller
                     'prod_cost'=>$request->prod_cost,
                     'prod_selling_price'=> $request->prod_selling_price,
                     'prod_quantity'=> $request->prod_quantity,
+                    'prod_size_id'=> $request->prod_size_id,
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,
@@ -65,7 +70,8 @@ class ProductController extends Controller
             $products = Product::whereIn('products.status', [0, 1])
             ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
             ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
-            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name')
+            ->join('sizes','products.prod_size_id','=','sizes.size_id')
+            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name','sizes.size_name')
             ->paginate($per_page);
             return ApiResponse::success(true,'Product list fetch successfully',$products,200);
         } catch (\Throwable $e) {
@@ -127,7 +133,8 @@ class ProductController extends Controller
             $products = Product::where('products.status', 2)
             ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
             ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
-            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name')
+            ->join('sizes','products.prod_size_id','=','sizes.size_id')
+            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name','sizes.size_name')
             ->paginate($per_page);
             return ApiResponse::success(true,'Product archive list fetch successfully',$products,200);
         } catch (\Throwable $e) {
