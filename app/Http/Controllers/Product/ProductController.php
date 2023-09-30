@@ -103,12 +103,27 @@ class ProductController extends Controller
     }
     public function update(Request $request,$id){
         try {
-            $category = Supplier::find($id);
-            $category->sup_name=$request->sup_name;
-            $category->sup_contact=$request->sup_contact;
-            $category->sup_description=$request->sup_description;
-            $category->save();
-            return ApiResponse::success(true,'Supplier updated successfully',$category,200);
+            $request->validate([
+                'prod_name' => 'required',
+                'prod_sup_id'=> 'required',
+                'prod_cat_id'=>'required',
+                'prod_cost'=> 'required',
+                'prod_selling_price'=>'required',
+                'prod_quantity'=> 'required',
+                'prod_size_id'=> 'required'
+            ]);
+            $userId= auth()->user()->id;
+            $product = Product::find($id);
+            $product->prod_name=$request->prod_name;
+            $product->prod_sup_id=$request->prod_sup_id;
+            $product->prod_cat_id=$request->prod_cat_id;
+            $product->prod_cost=$request->prod_cost;
+            $product->prod_selling_price=$request->prod_selling_price;
+            $product->prod_quantity=$request->prod_quantity;
+            $product->prod_size_id=$request->prod_size_id;
+            $product->modified_by=$userId;
+            $product->save();
+            return ApiResponse::success(true,'Supplier updated successfully',$product,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
