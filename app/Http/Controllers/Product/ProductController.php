@@ -80,18 +80,23 @@ class ProductController extends Controller
     }
     public function destory($id){
         try {
-            $category = Product::find($id);
-            $category->status=2;
-            $category->save();
-            return ApiResponse::success(true,'Product deleted successfully',$category,200);
+            $products = Product::find($id);
+            $products->status=2;
+            $products->save();
+            return ApiResponse::success(true,'Product deleted successfully',$products,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
     }
-    public function edit($id){
+    public function edit($id,Request $request){
         try {
-            $category = Product::find($id);
-            return ApiResponse::success(true,'Product fetch successfully',$category,200);
+            $product = Product::where('products.prod_id',$id)
+            ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
+            ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
+            ->join('sizes','products.prod_size_id','=','sizes.size_id')
+            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name','sizes.size_name')
+            ->get();
+            return ApiResponse::success(true,'Product fetch successfully',$product,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
@@ -110,16 +115,16 @@ class ProductController extends Controller
     }
     public function changeStatus($id){
         try {
-            $category = Product::find($id);
-            $status = $category->status;
+            $products = Product::find($id);
+            $status = $products->status;
             if($status===1){
-                $category->status=0;
+                $products->status=0;
             }
             else{
-                $category->status=1;
+                $products->status=1;
             }
-            $category->save();
-            return ApiResponse::success(true,'Product status updated successfully',$category,200);
+            $products->save();
+            return ApiResponse::success(true,'Product status updated successfully',$products,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
@@ -143,15 +148,15 @@ class ProductController extends Controller
     }
     public function restoreOrDelete(Request $request,$id){
         try {
-            $category = Product::find($id);
+            $products = Product::find($id);
             if($request->status===1){
-                $category->status=1;
+                $products->status=1;
             }
             else{
-                $category->status=3;
+                $products->status=3;
             }
-            $category->save();
-            return ApiResponse::success(true,'Product status updated successfully',$category,200);
+            $products->save();
+            return ApiResponse::success(true,'Product status updated successfully',$products,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
