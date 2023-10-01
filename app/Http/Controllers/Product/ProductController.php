@@ -77,12 +77,12 @@ class ProductController extends Controller
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('products.prod_name', 'LIKE', $searchTerm)
                       ->orWhere('products.prod_id', 'LIKE', $searchTerm)
-                      ->orWhere('products.prod_cost', 'LIKE', $searchTerm)
-                      ->orWhere('products.prod_selling_price', 'LIKE', $searchTerm)
-                      ->orWhere('products.prod_quantity', 'LIKE', $searchTerm)
+                    //   ->orWhere('products.prod_cost', 'LIKE', $searchTerm)
+                    //   ->orWhere('products.prod_selling_price', 'LIKE', $searchTerm)
+                    //   ->orWhere('products.prod_quantity', 'LIKE', $searchTerm)
                       ->orWhere('suppliers.sup_name', 'LIKE', $searchTerm)
-                      ->orWhere('product_categories.cat_name', 'LIKE', $searchTerm)
-                      ->orWhere('sizes.size_name', 'LIKE', $searchTerm);
+                      ->orWhere('product_categories.cat_name', 'LIKE', $searchTerm);
+                    //   ->orWhere('sizes.size_name', 'LIKE', $searchTerm);
                 });
             }
             $products = $query->paginate($per_page);
