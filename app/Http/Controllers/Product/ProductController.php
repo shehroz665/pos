@@ -63,17 +63,29 @@ class ProductController extends Controller
     } 
     public function index(Request $request){
         try {
-            $per_page=10;
-            if($request->per_page){
-                $per_page=$request->per_page; 
+            $per_page = 10;
+            if ($request->per_page) {
+                $per_page = $request->per_page;
             }
-            $products = Product::whereIn('products.status', [0, 1])
-            ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
-            ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
-            ->join('sizes','products.prod_size_id','=','sizes.size_id')
-            ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name','sizes.size_name')
-            ->paginate($per_page);
-            return ApiResponse::success(true,'Product list fetch successfully',$products,200);
+            $query = Product::whereIn('products.status', [0, 1])
+                ->join('suppliers', 'products.prod_sup_id', '=', 'suppliers.sup_id')
+                ->join('product_categories', 'products.prod_cat_id', '=', 'product_categories.cat_id')
+                ->join('sizes', 'products.prod_size_id', '=', 'sizes.size_id')
+                ->select('products.*', 'suppliers.sup_name', 'product_categories.cat_name', 'sizes.size_name');  
+            if ($request->search) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('products.prod_name', 'LIKE', $searchTerm)
+                      ->orWhere('products.prod_cost', 'LIKE', $searchTerm)
+                      ->orWhere('products.prod_selling_price', 'LIKE', $searchTerm)
+                      ->orWhere('products.prod_quantity', 'LIKE', $searchTerm)
+                      ->orWhere('suppliers.sup_name', 'LIKE', $searchTerm)
+                      ->orWhere('product_categories.cat_name', 'LIKE', $searchTerm)
+                      ->orWhere('sizes.size_name', 'LIKE', $searchTerm);
+                });
+            }
+            $products = $query->paginate($per_page);
+            return ApiResponse::success(true, 'Product list fetched successfully', $products, 200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
