@@ -38,12 +38,20 @@ class SupplierController extends Controller
     } 
     public function index(Request $request){
         try {
-            $per_page=10;
-            if($request->per_page){
-                $per_page=$request->per_page; 
+            $per_page = 10;
+            if ($request->per_page) {
+                $per_page = $request->per_page;
             }
-            $category = Supplier::whereIn('status',[0,1])->paginate($per_page);
-            return ApiResponse::success(true,'Supplier list fetch successfully',$category,200);
+            $query = Supplier::whereIn('status', [0, 1]);
+            if ($request->search) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('sup_name', 'LIKE', $searchTerm)
+                      ->orWhere('sup_contact', 'LIKE', $searchTerm);
+                });
+            }
+            $suppliers = $query->paginate($per_page);
+            return ApiResponse::success(true, 'Supplier list fetched successfully', $suppliers, 200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 

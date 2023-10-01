@@ -40,7 +40,11 @@ class ProductCategoryController extends Controller
                 $per_page=$request->per_page; 
             }
             $userId= auth()->user()->id;
-            $category = ProductCategory::where('user_id',$userId)->whereIn('status',[0,1])->paginate($per_page);
+            $category = ProductCategory::where('user_id',$userId)->whereIn('status',[0,1]);
+            if($request->search){
+                $category= $category->where('cat_name','LIKE','%'.$request->search.'%');
+            }
+            $category=$category->paginate($per_page);
             return ApiResponse::success(true,'Product Category list fetch successfully',$category,200);
         } catch (\Throwable $e) {
             return  ApiResponse::error(false, $e->getMessage(),[],500);
