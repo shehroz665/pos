@@ -7,6 +7,7 @@ use App\Http\Controllers\Category\ProductCategoryController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Size\SizeController;
+use App\Http\Controllers\Invoice\InvoiceController;
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -44,5 +45,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('size')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [SizeController::class, 'index']);
+    });
+    Route::prefix('invoice')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [InvoiceController::class, 'index']);
+        Route::post('/add', [InvoiceController::class, 'store']);
     });
 });
