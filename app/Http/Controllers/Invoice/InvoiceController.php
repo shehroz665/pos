@@ -11,23 +11,8 @@ class InvoiceController extends Controller
 {
     public function store(Request $request)
     {
-
         try {
-            // $request->validate([
-            //     'cat_name' => 'required|string',
-            // ]);
             // $userId= auth()->user()->id;
-            // DB::beginTransaction();
-            // $data =[
-            //         'cat_name' => $request->cat_name,
-            //         'user_id' => $userId,
-            //         'added_by' => $userId,
-            //         'modified_by'=>$userId,
-            //         'status'=>1,
-            // ];
-            // $category = ProductCategory::create($data);
-            // DB::commit();
-            // return ApiResponse::success(true,'Product Category successfully',$category,200);
             $request->validate([
                 'cust_name' => 'required',
                 'cust_number' => 'required',
@@ -54,5 +39,13 @@ class InvoiceController extends Controller
         }
 
     } 
+    public function edit($id){
+        try {
+            $invoice = Invoice::find($id);
+            return ApiResponse::success(true,'Invoice fetch successfully',$invoice,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
 
 }
