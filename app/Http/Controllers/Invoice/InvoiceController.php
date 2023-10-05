@@ -8,6 +8,8 @@ use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Invoice;
 use App\Models\Product;
+use Carbon\Carbon;
+
 class InvoiceController extends Controller
 {
     public function store(Request $request)
@@ -70,10 +72,11 @@ class InvoiceController extends Controller
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('cust_name', 'LIKE', $searchTerm)
                         ->orWhere('cust_number', 'LIKE', $searchTerm)
-                        ->orWhere('invoice_id', 'LIKE', $searchTerm);
+                        ->orWhere('invoice_id', 'LIKE', $searchTerm)
+                        ->orWhereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
                 });
             }
-    
+            $query->orderBy('invoice_id', 'desc');
             $invoices = $query->paginate($per_page);
     
             return ApiResponse::success(true, 'Invoice list fetched successfully', $invoices, 200);

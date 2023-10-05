@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Invoice extends Model
 {
@@ -21,5 +22,7 @@ class Invoice extends Model
     ];
     protected $casts = [
         'products' => 'json',
+        'created_at' => 'date:d-m-Y',
+        'updated_at' => 'date:d-m-Y',
     ];
 }
