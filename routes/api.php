@@ -49,6 +49,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('invoice')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [InvoiceController::class, 'index']);
         Route::post('/add', [InvoiceController::class, 'store']);
+        Route::get('/sales', [InvoiceController::class, 'sales']);
         Route::get('/{id}', [InvoiceController::class, 'edit']);
+
     });
 });

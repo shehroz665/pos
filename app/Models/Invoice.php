@@ -18,7 +18,9 @@ class Invoice extends Model
         'total_products',
         'total_price',
         'total_quantity',
+        'total_cost',
         'status',
+
     ];
     protected $casts = [
         'products' => 'json',

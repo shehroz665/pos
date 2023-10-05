@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('total_products');
             $table->integer('total_price');
             $table->integer('total_quantity');
+            $table->integer('total_cost');
             $table->tinyInteger('status')->nullable();
             $table->timestamps();
         });
