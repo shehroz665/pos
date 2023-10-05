@@ -7,12 +7,12 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Invoice;
+use App\Models\Product;
 class InvoiceController extends Controller
 {
     public function store(Request $request)
     {
         try {
-            // $userId= auth()->user()->id;
             $request->validate([
                 'cust_name' => 'required',
                 'cust_number' => 'required',
@@ -22,6 +22,13 @@ class InvoiceController extends Controller
                 'total_quantity' => 'required',
             ]);
             DB::beginTransaction();
+            foreach ($request->products as $product) {
+                $productId = $product['prod_id'];
+                $quantity = $product['quantity'];
+                $product = Product::find($productId);
+                $product->prod_quantity -= $quantity;
+                $product->save();
+            }
             $data = [
                 'cust_name' => $request->cust_name,
                 'cust_number' => $request->cust_number,
@@ -29,6 +36,8 @@ class InvoiceController extends Controller
                 'total_products' => $request->total_products,
                 'total_price' => $request->total_price,
                 'total_quantity' => $request->total_quantity,
+                'status'=>1
+                
             ];
             $invoice=Invoice::create($data);
             DB::commit();
@@ -47,5 +56,31 @@ class InvoiceController extends Controller
             return  ApiResponse::error(false, $e->getMessage(),[],500);
         } 
     }
+    public function index(Request $request){
+        try {
+            $per_page = 10;
+            if ($request->per_page) {
+                $per_page = $request->per_page; 
+            }
+    
+            $query = Invoice::whereIn('status', [0, 1]);
+    
+            if ($request->search) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('cust_name', 'LIKE', $searchTerm)
+                        ->orWhere('cust_number', 'LIKE', $searchTerm)
+                        ->orWhere('invoice_id', 'LIKE', $searchTerm);
+                });
+            }
+    
+            $invoices = $query->paginate($per_page);
+    
+            return ApiResponse::success(true, 'Invoice list fetched successfully', $invoices, 200);
+        } catch (\Throwable $e) {
+            return ApiResponse::error(false, $e->getMessage(), [], 500);
+        } 
+    }
+    
 
 }
