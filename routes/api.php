@@ -50,6 +50,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('invoice')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [InvoiceController::class, 'index']);
         Route::get('/credit', [InvoiceController::class, 'credit']);
+        Route::post('/update/{id}', [InvoiceController::class, 'update']);
         Route::post('/add', [InvoiceController::class, 'store']);
         Route::get('/sales', [InvoiceController::class, 'sales']);
         Route::get('/{id}', [InvoiceController::class, 'edit']);

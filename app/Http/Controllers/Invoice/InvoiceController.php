@@ -142,5 +142,19 @@ class InvoiceController extends Controller
             return ApiResponse::error(false, $e->getMessage(), [], 500);
         } 
     }
-
+    public function update(Request $request,$id){
+        try {
+            $request->validate([
+                'status'=> 'required',
+                'borrow_amount' => 'required',
+            ]);
+            $invoice = Invoice::find($id);
+            $invoice->borrow_amount=$request->borrow_amount;
+            $invoice->status=$request->status;
+            $invoice->save();
+            return ApiResponse::success(true,'Credit Product is updated successfully',$invoice,200);
+        } catch (\Throwable $e) {
+            return  ApiResponse::error(false, $e->getMessage(),[],500);
+        } 
+    }
 }
