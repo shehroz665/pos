@@ -89,18 +89,31 @@ class InvoiceController extends Controller
     public function sales(Request $request){
         try {
             $query = Invoice::whereIn('status', [0, 1]);
+            
             if ($request->search) {
                 $searchTerm = '%' . $request->search . '%';
                 $query->where(function ($q) use ($searchTerm) {
                     $q->whereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
                 });
             }
+            $query->selectRaw('SUM(total_products) as total_products_sum');
+            $query->selectRaw('SUM(total_price) as total_price_sum');
+            $query->selectRaw('SUM(total_quantity) as total_quantity_sum');
+            $query->selectRaw('SUM(total_cost) as total_cost_sum');
             $query->orderBy('invoice_id', 'desc');
             $invoices = $query->get();
-            return ApiResponse::success(true, 'Invoice list fetched successfully', $invoices, 200);
+            $sums = [
+                'total_products_sum' => $invoices->first()->total_products_sum ?? 0,
+                'total_price_sum' => $invoices->first()->total_price_sum ?? 0,
+                'total_quantity_sum' => $invoices->first()->total_quantity_sum ?? 0,
+                'total_cost_sum' => $invoices->first()->total_cost_sum ?? 0,
+            ];
+    
+            return ApiResponse::success(true, 'Invoice list fetched successfully', $sums, 200);
         } catch (\Throwable $e) {
             return ApiResponse::error(false, $e->getMessage(), [], 500);
         } 
-    }    
+    }
+    
 
 }
