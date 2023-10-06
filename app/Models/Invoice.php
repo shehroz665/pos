@@ -19,6 +19,7 @@ class Invoice extends Model
         'total_price',
         'total_quantity',
         'total_cost',
+        'borrow_amount',
         'status',
 
     ];

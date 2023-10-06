@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ProductController::class, 'index']);
+        Route::get('/availableProducts', [ProductController::class, 'availableProducts']);
         Route::get('/archive', [ProductController::class, 'archive']);
         Route::get('/dropdown', [ProductController::class, 'dropdown']);
         Route::post('/add', [ProductController::class, 'store']);
@@ -48,6 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('invoice')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [InvoiceController::class, 'index']);
+        Route::get('/credit', [InvoiceController::class, 'credit']);
         Route::post('/add', [InvoiceController::class, 'store']);
         Route::get('/sales', [InvoiceController::class, 'sales']);
         Route::get('/{id}', [InvoiceController::class, 'edit']);

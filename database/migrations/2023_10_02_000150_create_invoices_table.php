@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('total_price');
             $table->integer('total_quantity');
             $table->integer('total_cost');
+            $table->integer('borrow_amount')->nullable();
             $table->tinyInteger('status')->nullable();
             $table->timestamps();
         });

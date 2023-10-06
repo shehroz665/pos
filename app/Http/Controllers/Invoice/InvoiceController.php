@@ -40,7 +40,8 @@ class InvoiceController extends Controller
                 'total_price' => $request->total_price,
                 'total_quantity' => $request->total_quantity,
                 'total_cost'=> $request->total_cost,
-                'status'=>1
+                'borrow_amount'=>$request->borrow_amount,
+                'status'=>$request->status
                 
             ];
             $invoice=Invoice::create($data);
@@ -75,7 +76,7 @@ class InvoiceController extends Controller
                     $q->where('cust_name', 'LIKE', $searchTerm)
                         ->orWhere('cust_number', 'LIKE', $searchTerm)
                         ->orWhere('invoice_id', 'LIKE', $searchTerm)
-                        ->orWhereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
+                        ->orWhereRaw("DATE_FORMAT(updated_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
                 });
             }
             $query->orderBy('invoice_id', 'desc');
@@ -93,7 +94,8 @@ class InvoiceController extends Controller
             if ($request->search) {
                 $searchTerm = '%' . $request->search . '%';
                 $query->where(function ($q) use ($searchTerm) {
-                    $q->whereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
+                    // $q->whereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
+                    $q->whereRaw("DATE_FORMAT(updated_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
                 });
             }
             $query->selectRaw('SUM(total_products) as total_products_sum');
@@ -114,6 +116,31 @@ class InvoiceController extends Controller
             return ApiResponse::error(false, $e->getMessage(), [], 500);
         } 
     }
+    public function credit(Request $request){
+        try {
+            $per_page = 10;
+            if ($request->per_page) {
+                $per_page = $request->per_page; 
+            }
     
+            $query = Invoice::where('status',2);
+    
+            if ($request->search) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('cust_name', 'LIKE', $searchTerm)
+                        ->orWhere('cust_number', 'LIKE', $searchTerm)
+                        ->orWhere('invoice_id', 'LIKE', $searchTerm)
+                        ->orWhereRaw("DATE_FORMAT(created_at, '%d-%m-%Y') LIKE ?", [$searchTerm]);
+                });
+            }
+            $query->orderBy('invoice_id', 'desc');
+            $invoices = $query->paginate($per_page);
+    
+            return ApiResponse::success(true, 'Invoice list fetched successfully', $invoices, 200);
+        } catch (\Throwable $e) {
+            return ApiResponse::error(false, $e->getMessage(), [], 500);
+        } 
+    }
 
 }
