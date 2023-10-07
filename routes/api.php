@@ -35,6 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('product')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::get('/availableProducts', [ProductController::class, 'availableProducts']);
+        Route::get('/outOfStock', [ProductController::class, 'outOfStock']);
         Route::get('/archive', [ProductController::class, 'archive']);
         Route::get('/dropdown', [ProductController::class, 'dropdown']);
         Route::post('/add', [ProductController::class, 'store']);
