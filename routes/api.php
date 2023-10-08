@@ -8,6 +8,7 @@ use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Size\SizeController;
 use App\Http\Controllers\Invoice\InvoiceController;
+use App\Http\Controllers\Statistics\StatisticsController;
 Route::post('/login',[AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -55,6 +56,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/add', [InvoiceController::class, 'store']);
         Route::get('/sales', [InvoiceController::class, 'sales']);
         Route::get('/{id}', [InvoiceController::class, 'edit']);
-
+    });
+    Route::prefix('statistics')->middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [StatisticsController::class, 'index']);
     });
 });
