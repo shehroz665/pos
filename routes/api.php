@@ -59,5 +59,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
     Route::prefix('statistics')->middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [StatisticsController::class, 'index']);
+        Route::get('/getWeeklyStatistics', [StatisticsController::class, 'getWeeklyStatistics']);
     });
 });

@@ -39,4 +39,40 @@ class StatisticsController extends Controller
             return ApiResponse::error(false, $e->getMessage(), [], 500);
         } 
     }
+    public function getWeeklyStatistics()
+    {
+        $currentDate = Carbon::now();
+        $startDate = $currentDate->startOfWeek();
+        $endDate = $currentDate->endOfWeek();
+    
+        $startDateFormatted = $startDate->format('Y-m-d'); // Format as yyyy-mm-dd
+        $endDateFormatted = $endDate->format('Y-m-d');     // Format as yyyy-mm-dd
+    
+        // Fetch the data from the database for the specified week
+        $weeklyStatistics = Invoice::selectRaw('SUM(total_price) as total_sales, DATE(created_at) as sale_date')
+            ->whereBetween('created_at', [$startDateFormatted, $endDateFormatted])
+            ->groupBy('sale_date')
+            ->get();
+    
+        // Initialize an associative array to store category sales
+        $formattedData = [];
+    
+        // Loop through the fetched data and format it
+        foreach ($weeklyStatistics as $statistic) {
+            // Extract the day from the sale_date
+            $day = Carbon::parse($statistic->sale_date)->format('l');
+            $formattedData[] = [
+                'name' => $day,
+                'sales' => $statistic->total_sales,
+            ];
+        }
+    
+        return response()->json([
+            'start_date' => $startDateFormatted,
+            'end_date' => $endDateFormatted,
+            'weekly_statistics' => $formattedData,
+        ]);
+    }
+    
+    
 }
