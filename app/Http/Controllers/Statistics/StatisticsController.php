@@ -28,12 +28,14 @@ class StatisticsController extends Controller
             $invoiceController = new InvoiceController;
             $invoiceResponse = $invoiceController->sales($invoiceRequest);
             $totalStock = DB::table('invoices')->sum(DB::raw('total_cost * total_quantity'));
+            $graphStatistics = $this->getWeeklyStatistics()->original;
             $data=[
                 'products'=> $products,
                 'suppliers'=> $suppliers,
                 'categories'=> $category,
                  'sales'=> $invoiceResponse->original['data'],
                  'totalStock'=>$totalStock,
+                 'graphStatistics'=>$graphStatistics,
                  'date'=> $todayDate
             ];
             return ApiResponse::success(true, 'Invoice list fetched successfully', $data, 200);
@@ -43,37 +45,26 @@ class StatisticsController extends Controller
     }
     public function getWeeklyStatistics()
     {
-        $currentDate = Carbon::now();
-        $startDate = $currentDate->startOfWeek();
-        $endDate = $currentDate->endOfWeek();
+        try {
+            $weeklyStatistics = [];
+            $currentDayOfWeek = Carbon::now()->dayOfWeek;
+            $offsetToSunday = ($currentDayOfWeek + 1) % 7;
+            for ($i = 0; $i < 7; $i++) {
+                $date = Carbon::now()->subDays($offsetToSunday - $i);
+                $salesForDay = Invoice::whereDate('updated_date', $date->format('d-m-y'))
+                    ->sum('total_price');
     
-        $startDateFormatted = $startDate->format('Y-m-d'); // Format as yyyy-mm-dd
-        $endDateFormatted = $endDate->format('Y-m-d');     // Format as yyyy-mm-dd
+                $weeklyStatistics[] = [
+                    'name' => $date->format('l'), 
+                    'date' => $date->format('d-m-y'),
+                    'sales' => intval($salesForDay),
+                ];
+            }
     
-        // Fetch the data from the database for the specified week
-        $weeklyStatistics = Invoice::selectRaw('SUM(total_price) as total_sales, DATE(created_at) as sale_date')
-            ->whereBetween('created_at', [$startDateFormatted, $endDateFormatted])
-            ->groupBy('sale_date')
-            ->get();
-    
-        // Initialize an associative array to store category sales
-        $formattedData = [];
-    
-        // Loop through the fetched data and format it
-        foreach ($weeklyStatistics as $statistic) {
-            // Extract the day from the sale_date
-            $day = Carbon::parse($statistic->sale_date)->format('l');
-            $formattedData[] = [
-                'name' => $day,
-                'sales' => $statistic->total_sales,
-            ];
+            return response()->json($weeklyStatistics);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-    
-        return response()->json([
-            'start_date' => $startDateFormatted,
-            'end_date' => $endDateFormatted,
-            'weekly_statistics' => $formattedData,
-        ]);
     }
     
     
