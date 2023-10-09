@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\Supplier;
-
+use Carbon\Carbon;
 class SupplierController extends Controller
 {
     public function store(Request $request)
@@ -26,6 +26,8 @@ class SupplierController extends Controller
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,
+                    'created_date'=>Carbon::now()->format('d-m-y'),
+                    'updated_date'=>Carbon::now()->format('d-m-y'),
             ];
             $category = Supplier::create($data);
             DB::commit();
@@ -48,7 +50,9 @@ class SupplierController extends Controller
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('sup_name', 'LIKE', $searchTerm)
                     ->orWhere('sup_id', 'LIKE', $searchTerm)
-                      ->orWhere('sup_contact', 'LIKE', $searchTerm);
+                      ->orWhere('sup_contact', 'LIKE', $searchTerm)
+                      ->orWhere('created_date', 'LIKE', $searchTerm)
+                      ->orWhere('updated_date', 'LIKE', $searchTerm);
                 });
             }
             $suppliers = $query->paginate($per_page);
@@ -61,6 +65,7 @@ class SupplierController extends Controller
         try {
             $category = Supplier::find($id);
             $category->status=2;
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Supplier deleted successfully',$category,200);
         } catch (\Throwable $e) {
@@ -81,6 +86,7 @@ class SupplierController extends Controller
             $category->sup_name=$request->sup_name;
             $category->sup_contact=$request->sup_contact;
             $category->sup_description=$request->sup_description;
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Supplier updated successfully',$category,200);
         } catch (\Throwable $e) {
@@ -97,6 +103,7 @@ class SupplierController extends Controller
             else{
                 $category->status=1;
             }
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Supplier status updated successfully',$category,200);
         } catch (\Throwable $e) {
@@ -125,6 +132,7 @@ class SupplierController extends Controller
             else{
                 $category->status=3;
             }
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Supplier status updated successfully',$category,200);
         } catch (\Throwable $e) {

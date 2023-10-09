@@ -17,6 +17,8 @@ return new class extends Migration
             // $table->string('sup_contact');
             $table->bigInteger('sup_contact');
             $table->text('sup_description')->nullable();
+            $table->string('updated_date')->nullable();
+            $table->string('created_date')->nullable();
             $table->string('added_by');
             $table->string('modified_by')->nullable();
             $table->tinyInteger('status')->default(1);
