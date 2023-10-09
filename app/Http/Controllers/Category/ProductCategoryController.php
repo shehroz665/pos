@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductCategory;
+use Carbon\Carbon;
 class ProductCategoryController extends Controller
 {
     public function store(Request $request)
@@ -23,6 +24,8 @@ class ProductCategoryController extends Controller
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,
+                    'created_date'=>Carbon::now()->format('d-m-y'),
+                    'updated_date'=>Carbon::now()->format('d-m-y'),
             ];
             $category = ProductCategory::create($data);
             DB::commit();
@@ -45,7 +48,9 @@ class ProductCategoryController extends Controller
                 $searchTerm = '%' . $request->search . '%';
                 $category->where(function ($query) use ($searchTerm) {
                     $query->where('cat_name', 'LIKE', $searchTerm)
-                          ->orWhere('cat_id', 'LIKE', $searchTerm);
+                          ->orWhere('cat_id', 'LIKE', $searchTerm)
+                          ->orWhere('created_date', 'LIKE', $searchTerm)
+                          ->orWhere('updated_date', 'LIKE', $searchTerm);
                 });
             }
             $category=$category->paginate($per_page);
@@ -58,6 +63,7 @@ class ProductCategoryController extends Controller
         try {
             $category = ProductCategory::find($id);
             $category->status=2;
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Product Category deleted successfully',$category,200);
         } catch (\Throwable $e) {
@@ -76,6 +82,7 @@ class ProductCategoryController extends Controller
         try {
             $category = ProductCategory::find($id);
             $category->cat_name=$request->cat_name;
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Product Category updated successfully',$category,200);
         } catch (\Throwable $e) {
@@ -92,6 +99,7 @@ class ProductCategoryController extends Controller
             else{
                 $category->status=1;
             }
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Product Category status updated successfully',$category,200);
         } catch (\Throwable $e) {
@@ -120,6 +128,7 @@ class ProductCategoryController extends Controller
             else{
                 $category->status=3;
             }
+            $category->updated_date=Carbon::now()->format('d-m-y');
             $category->save();
             return ApiResponse::success(true,'Product Category status updated successfully',$category,200);
         } catch (\Throwable $e) {

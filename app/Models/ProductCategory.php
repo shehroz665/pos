@@ -10,5 +10,5 @@ class ProductCategory extends Model
     use HasFactory;
     protected $table = 'product_categories';
     protected $primaryKey = 'cat_id';
-    protected $fillable = ['cat_name', 'user_id', 'added_by', 'modified_by'];
+    protected $fillable = ['cat_name', 'user_id', 'added_by', 'modified_by','created_date','updated_date','status'];
 }

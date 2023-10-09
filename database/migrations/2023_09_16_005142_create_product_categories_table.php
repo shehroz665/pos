@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('product_categories', function (Blueprint $table) {
             $table->id('cat_id'); 
             $table->string('cat_name');
+            $table->string('updated_date')->nullable();
+            $table->string('created_date')->nullable();
             $table->unsignedBigInteger('user_id');     
             $table->unsignedBigInteger('added_by'); 
             $table->unsignedBigInteger('modified_by');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }
