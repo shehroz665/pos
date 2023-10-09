@@ -23,6 +23,9 @@ class Product extends Model
         'prod_selling_price',
         'image',
         'prod_quantity',
-        'prod_size_id'
+        'prod_size_id',
+        'created_date',
+        'updated_date', 
     ];
+    public $timestamps = false;
 }

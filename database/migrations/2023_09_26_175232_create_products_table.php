@@ -18,6 +18,8 @@ return new class extends Migration
             // $table->string('prod_sup_name');
             $table->unsignedBigInteger('prod_cat_id');
             // $table->string('prod_cat_name');
+            $table->string('updated_date')->nullable();
+            $table->string('created_date')->nullable();
             $table->string('added_by');
             $table->string('modified_by')->nullable();
             $table->tinyInteger('status')->default(1);

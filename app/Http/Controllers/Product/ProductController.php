@@ -10,6 +10,8 @@ use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Models\Size;
 use App\Models\Product;
+use Carbon\Carbon;
+
 class ProductController extends Controller
 {
     public function dropdown(Request $request){
@@ -52,6 +54,8 @@ class ProductController extends Controller
                     'added_by' => $userId,
                     'modified_by'=>$userId,
                     'status'=>1,
+                    'created_date'=>Carbon::now()->format('d-m-y'),
+                    'updated_date'=>Carbon::now()->format('d-m-y'),
             ];
             $product = Product::create($data);
             DB::commit();
@@ -80,7 +84,8 @@ class ProductController extends Controller
                     //   ->orWhere('products.prod_cost', 'LIKE', $searchTerm)
                     //   ->orWhere('products.prod_selling_price', 'LIKE', $searchTerm)
                     //   ->orWhere('products.prod_quantity', 'LIKE', $searchTerm)
-                      ->orWhere('suppliers.sup_name', 'LIKE', $searchTerm)
+                      ->orWhere('suppliers.sup_name', 'LIKE', $searchTerm) 
+                      ->orWhere('sizes.size_name', 'LIKE', $searchTerm)
                       ->orWhere('product_categories.cat_name', 'LIKE', $searchTerm);
                     //   ->orWhere('sizes.size_name', 'LIKE', $searchTerm);
                 });
@@ -126,6 +131,7 @@ class ProductController extends Controller
         try {
             $products = Product::find($id);
             $products->status=2;
+            $products->updated_date=Carbon::now()->format('d-m-y');
             $products->save();
             return ApiResponse::success(true,'Product deleted successfully',$products,200);
         } catch (\Throwable $e) {
@@ -166,6 +172,7 @@ class ProductController extends Controller
             $product->prod_quantity=$request->prod_quantity;
             $product->prod_size_id=$request->prod_size_id;
             $product->modified_by=$userId;
+            $product->updated_date=Carbon::now()->format('d-m-y');
             $product->save();
             return ApiResponse::success(true,'Supplier updated successfully',$product,200);
         } catch (\Throwable $e) {
@@ -182,6 +189,7 @@ class ProductController extends Controller
             else{
                 $products->status=1;
             }
+            $products->updated_date=Carbon::now()->format('d-m-y');
             $products->save();
             return ApiResponse::success(true,'Product status updated successfully',$products,200);
         } catch (\Throwable $e) {
@@ -214,6 +222,7 @@ class ProductController extends Controller
             else{
                 $products->status=3;
             }
+            $products->updated_date=Carbon::now()->format('d-m-y');
             $products->save();
             return ApiResponse::success(true,'Product status updated successfully',$products,200);
         } catch (\Throwable $e) {
