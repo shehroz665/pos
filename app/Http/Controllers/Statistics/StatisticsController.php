@@ -21,17 +21,19 @@ class StatisticsController extends Controller
             $suppliers=Supplier::where('status',1)->count();
             $category=ProductCategory::where('status',1)->count();
             $currentDate = Carbon::now();
-            $todayDate = $currentDate->format('d-m-Y');
+            $todayDate = $currentDate->format('d-m-y');
             $invoiceRequest = new Request([
                 'search' => $todayDate,
             ]);
             $invoiceController = new InvoiceController;
             $invoiceResponse = $invoiceController->sales($invoiceRequest);
+            $totalStock = DB::table('invoices')->sum(DB::raw('total_cost * total_quantity'));
             $data=[
                 'products'=> $products,
                 'suppliers'=> $suppliers,
                 'categories'=> $category,
                  'sales'=> $invoiceResponse->original['data'],
+                 'totalStock'=>$totalStock,
                  'date'=> $todayDate
             ];
             return ApiResponse::success(true, 'Invoice list fetched successfully', $data, 200);
