@@ -22,6 +22,8 @@ return new class extends Migration
             $table->integer('total_cost');
             $table->integer('borrow_amount')->nullable();
             $table->tinyInteger('status')->nullable();
+            $table->string('updated_date')->nullable();
+            $table->string('created_date')->nullable();
             $table->timestamps();
         });
     }
