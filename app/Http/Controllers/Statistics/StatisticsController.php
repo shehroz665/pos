@@ -55,7 +55,7 @@ class StatisticsController extends Controller
                     ->sum('total_price');
     
                 $weeklyStatistics[] = [
-                    'name' => $date->format('l'), 
+                    'name' => $date->format('D'),
                     'date' => $date->format('d-m-y'),
                     'sales' => intval($salesForDay),
                 ];
