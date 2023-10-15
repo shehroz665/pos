@@ -14,7 +14,7 @@ class ProductCategoryController extends Controller
     {
         try {
             $request->validate([
-                'cat_name' => 'required|string',
+                'cat_name' => 'required|string|unique:product_categories,cat_name',
             ]);
             $userId= auth()->user()->id;
             DB::beginTransaction();
