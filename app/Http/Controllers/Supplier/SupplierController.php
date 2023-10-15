@@ -14,7 +14,7 @@ class SupplierController extends Controller
     {
         try {
             $request->validate([
-                'sup_name' => 'required|string|unique:suppliers,sup_name,',
+                'sup_name' => 'required|string',
                 'sup_contact'=> 'required|string',
             ]);
             $userId= auth()->user()->id;
